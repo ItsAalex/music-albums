@@ -54,6 +54,18 @@ func albumByID(id int64) (Album, error) {
 }
 
 func addAlbum(alb Album) (int64, error) {
+
+	exists, err := albumExists(alb.Title, alb.Artist)
+
+	if err != nil {
+		return 0, fmt.Errorf("addAlbum: %v", err)
+	}
+
+	if exists {
+		fmt.Println("Album already exists")
+		return 0, nil
+	}
+
 	result, err := db.Exec("INSERT INTO album (title, artist, price) VALUES (?, ?, ?)", alb.Title, alb.Artist, alb.Price)
 
 	// check for an error from the attempt to INSERT
@@ -72,6 +84,7 @@ func addAlbum(alb Album) (int64, error) {
 }
 
 func deleteAlbum(id int64) (int64, error) {
+
 	_, err := db.Exec("DELETE FROM album WHERE id = ? ", id)
 
 	if err != nil {
@@ -80,4 +93,14 @@ func deleteAlbum(id int64) (int64, error) {
 		fmt.Printf("Album with id %v is deleted", id)
 	}
 	return 1, nil
+}
+
+func albumExists(title, artist string) (bool, error) {
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM album WHERE title = ? AND artist = ?", title, artist).Scan(&count)
+
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

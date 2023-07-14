@@ -22,6 +22,15 @@ func main() {
 	alb, err := albumByID(2)
 	CheckError(err)
 	fmt.Printf("Album found: %v\n", alb)
+
+	albID, err := addAlbum(Album{
+		Title:  "Blue Train",
+		Artist: "John Coltrane",
+		Price:  56.99,
+	})
+
+	CheckError(err)
+	fmt.Printf("ID of added album: %v\n", albID)
 }
 
 //Look at the code by ignoring err parts. It will be more clear
